@@ -1,11 +1,10 @@
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-const publicDir = path.resolve(__dirname, 'public');
 module.exports = {
     entry: './dev/app.js',
     output: {
-        path: publicDir,
+        path: path.resolve(__dirname, 'public'),
         filename: 'bundle.js'
         // publicPath: 'public/' /* if placing index.html outside of 'public' directory, need to specify a path to append to webpack generated static resources */
     },
