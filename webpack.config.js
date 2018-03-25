@@ -1,12 +1,26 @@
-const path = require('path');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const path = require('path')
+const webpack = require('webpack')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 
-// publicPath: 'public/' /* if placing index.html outside of 'public' directory, need to specify a path under 'output' which will append to webpack generated static resources */
-module.exports = {
-    entry: './dev/app.js',
+let entries = {
+    bundle: './src/app.js'
+}
+
+//split the vendor dependencies into a separate bundle/file (if any exist)
+const dependencies = require('./package.json').dependencies;
+if(dependencies){
+    entries['vendor'] = Object.keys(dependencies); //array of vendor library names
+}
+
+const config = {
+    entry: entries,
     output: {
-        path: path.resolve(__dirname, 'public'),
-        filename: 'bundle.js'
+        path: path.join(__dirname, 'dist'),
+        filename: 'main.[name]-[id].[chunkhash].js', //'name' references the entry key (i.e., 'bundle')
+        hashDigestLength: 20
+        // publicPath: 'public/' /* if placing index.html outside of 'public' directory, need to specify a path under 'output' which will append to webpack generated static resources */
     },
     stats: {
         colors: true
@@ -39,11 +53,30 @@ module.exports = {
             }
         ]
     },
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                vendor: {
+                    chunks: "initial",
+                    test: "vendor",
+                    name: "vendor",
+                    enforce: true
+                }
+            }
+        }
+    },
     plugins: [
-        new ExtractTextPlugin('style.css') // tells ExtractText lib to find files transformed by its loader, and save into style.css
+        new HtmlWebpackPlugin({
+            title: 'My Webpack Demo App',
+            template: 'src/index.html'
+        }),
+        new ExtractTextPlugin('style-[chunkhash].css'), // tells ExtractText lib to find files transformed by its loader, and save into style.css
+        new CleanWebpackPlugin(['dist/*.*']) //clean dist directory on builds
     ],
     devtool: 'source-map'
 };
+
+module.exports = config;
 
 // devServer: {
 //     contentBase: publicDir,

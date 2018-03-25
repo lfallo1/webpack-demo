@@ -16,8 +16,11 @@ const iAmJavascriptES6 = () => console.log(...arr);
 window.iAmJavascriptES6 = iAmJavascriptES6;
 
 //dummy image functionality - loads import at runtime
-let imageButton = document.getElementById("click-me-button");
+let imageButton = document.createElement('button');
+imageButton.id = 'click-me-button';
+imageButton.innerText = 'Show Image';
 imageButton.onclick = () => {
     imageButton.setAttribute('disabled', true);
     System.import('./image_viewer.js').then(imageViewer =>imageViewer.loadImage());
 };
+document.body.appendChild(imageButton);
